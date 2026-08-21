@@ -13,8 +13,30 @@ const fetchJobs = async () => {
 
    try {
     const response = await fetch(url, options);
-    const result = await response.text();
-    console.log(result);
+    const result = await response.json();
+
+
+    const normalizeJob = (job) => {
+        return {
+            id: job.jsonLD?.identifier,
+            industry: job.industry,
+            title: job.title,
+            company: job.company,
+            city: job.city,
+            description: job.jsonLD?.description,
+            sourceURL: job.jsonLD?.url,
+            postedAt: job.jsonLD?.datePosted,
+
+        };
+    };
+
+    const jobs = result.result.map(job => normalizeJob(job));
+
+
+    console.log(jobs);
+
+
+
    }catch(error){
     console.error(error);
    }
