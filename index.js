@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const fetchJobs = async () => {
-   const url = "https://daily-international-job-postings.p.rapidapi.com/api/v2/jobs/search?format=json&countryCode=ae&hasSalary=true&page=1"
+   const url = "https://daily-international-job-postings.p.rapidapi.com/api/v2/jobs/search?format=json&countryCode=ae&page=1"
    const options = {
     method: 'GET',
     headers: {
@@ -13,7 +13,7 @@ const fetchJobs = async () => {
 
    try {
     const response = await fetch(url, options);
-    const result = await response.json();
+    const data = await response.json();
 
 
     const normalizeJob = (job) => {
@@ -30,7 +30,7 @@ const fetchJobs = async () => {
         };
     };
 
-    const jobs = result.result.map(job => normalizeJob(job));
+    const jobs = data.result.map(job => normalizeJob(job));
 
 
     console.log(jobs);
