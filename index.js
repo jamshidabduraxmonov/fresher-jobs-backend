@@ -1,4 +1,5 @@
-require("dotenv").config();
+import "dotenv/config"
+import classifyJob from "./classifyJob.js"
 
 const fetchJobs = async () => {
    const url = "https://daily-international-job-postings.p.rapidapi.com/api/v2/jobs/search?format=json&countryCode=ae&page=1"
@@ -30,7 +31,13 @@ const fetchJobs = async () => {
         };
     };
 
-    const jobs = data.result.map(job => normalizeJob(job));
+    
+
+    const jobs = data.result
+    .map((job)=> normalizeJob(job))
+    .map((job)=> classifyJob(job));
+
+
 
 
     console.log(jobs);
