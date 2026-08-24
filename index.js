@@ -2,7 +2,9 @@ import "dotenv/config"
 import classifyJob from "./classifyJob.js"
 
 const fetchJobs = async () => {
-   const url = "https://daily-international-job-postings.p.rapidapi.com/api/v2/jobs/search?format=json&countryCode=ae&page=1"
+
+    const allJobs = [];
+
    const options = {
     method: 'GET',
     headers: {
@@ -10,11 +12,24 @@ const fetchJobs = async () => {
         'x-rapidapi-host': 'daily-international-job-postings.p.rapidapi.com',
         'Content-Type': 'application/json'
     }
+
    };
 
    try {
-    const response = await fetch(url, options);
-    const data = await response.json();
+
+    for( let page = 1; page <= 5; page++){
+            const url = `https://daily-international-job-postings.p.rapidapi.com/api/v2/jobs/search?format=json&countryCode=ae&dateCreated=2026-08&page=${page}`;
+            const response = await fetch(url, options);
+            const data = await response.json();
+
+            console.log(`Page ${page}: ${data.result.length} jobs`);
+
+            allJobs.push(...data.result);
+
+    }
+
+    console.log(`Total fetched: ${allJobs.length}`);
+
 
 
     const normalizeJob = (job) => {
@@ -33,7 +48,7 @@ const fetchJobs = async () => {
 
     
 
-    const jobs = data.result
+    const jobs = allJobs
     .map((job)=> normalizeJob(job))
     .map((job)=> classifyJob(job));
 
