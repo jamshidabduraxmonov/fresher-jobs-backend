@@ -94,40 +94,6 @@ const fetchJobs = async () => {
     }
 
 
-    // for( let page = 1; page <= 5; page++){
-
-    //         const params = new URLSearchParams({
-    //             format: "json",
-    //             countryCode: "ae",
-    //             dateCreated: "2026-08",
-    //             title: [
-    //                 "waiter",
-    //                 "waitress",
-    //                 "barista",
-    //                 "hotel receptionist",
-    //                 "front desk",
-    //                 "guest service",
-    //                 "housekeeping",
-    //                 "room attendant",
-    //                 "kitchen helper",
-    //             ].join(","),
-    //             isDuplicate: "false",
-    //             isActive: "true",
-    //             page: String(page),
-    //         });
-
-    //         const url =
-    //             "https://daily-international-job-postings.p.rapidapi.com/api/v2/jobs/search?" +
-    //             params.toString();
-
-    //         const response = await fetch(url, options);
-    //         const data = await response.json();
-
-    //         console.log(`Page ${page}: ${data?.result?.length} jobs`);
-
-    //         allJobs.push(...data?.result);
-
-    // }
 
     const allJobs = await fetchJobBucket(
         jobQueries.hospitality,
