@@ -1,5 +1,7 @@
 import "dotenv/config"
 import classifyJob from "./classifyJob.js"
+import saveJob from './saveJob.js'
+import database from "./database.js";
 
 const fetchJobs = async () => {
 
@@ -97,7 +99,7 @@ const fetchJobs = async () => {
 
     const allJobs = await fetchJobBucket(
         jobQueries.hospitality,
-        5
+        1
     );
 
     console.log(`Total fetched: ${allJobs.length}`);
@@ -127,12 +129,22 @@ const fetchJobs = async () => {
 
 
 
-    console.log(jobs);
+    for(let index = 0; index < jobs.length; index++){
+        await saveJob(
+            jobs[index],
+            allJobs[index]
+        );
+    }
+
+    console.log(`Saved ${jobs.length} jobs successfully!`)
+
 
 
 
    }catch(error){
     console.error(error);
+   }finally {
+        await database.end();
    }
 };
 
