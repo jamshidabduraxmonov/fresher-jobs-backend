@@ -72,7 +72,7 @@ const fetchJobs = async () => {
             const params = new URLSearchParams({
                 format: "json",
                 countryCode: "ae",
-                dateCreated: "2026-08",
+                dateCreated: "2026-08-29",
                 title: buildTitleQuery(titles),
                 isDuplicate: "false",
                 isActive: "true",
@@ -86,6 +86,19 @@ const fetchJobs = async () => {
             const response = await fetch(url, options);
 
             if(!response.ok) {
+
+            const errorBody = await response.text();
+
+            console.error({
+                    category,
+                    titles,
+                    page,
+                    url,
+                    status: response.status,
+                    errorBody,
+                });
+
+
                 throw new Error(`Request failed: ${response.status}`);
             };
 

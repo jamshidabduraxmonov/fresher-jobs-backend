@@ -30,7 +30,12 @@ const saveJob = async (job, rawData)=> {
                 description = EXCLUDED.description,
                 source_url = EXCLUDED.source_url,
                 posted_at = EXCLUDED.posted_at,
-                categories = EXCLUDED.categories,
+                categories = ARRAY(
+                    SELECT DISTINCT category
+                    FROM UNNEST(
+                        jobs.categories || EXCLUDED.categories
+                    ) AS category
+                ),
                 fresher_friendly = EXCLUDED.fresher_friendly,
                 fresher_score = EXCLUDED.fresher_score,
                 matched_signals = EXCLUDED.matched_signals,
