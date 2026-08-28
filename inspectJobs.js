@@ -75,6 +75,22 @@ const inspectJobs = async ()=> {
                     console.log("Deleted test rows: ");
                     console.log(deleteResult.rows);
 
+
+                const locationInfo = await database.query(`
+                    SELECT
+                        id,
+                        title,
+                        categories,
+                        city,
+                        fresher_friendly,
+                        raw_data->>'countryCode' AS country_code
+                    FROM jobs
+                    ORDER BY fetched_at DESC;
+                    `);
+
+                    console.log("Jobs Location codes: ");
+                    console.log(locationInfo.rows);
+
     }catch(error){
         console.error("Database inspection failed: ");
         console.error(error);

@@ -19,41 +19,52 @@ const fetchJobs = async () => {
 
    try {
 
-    const jobQueries = {
-        hospitality: [
+    const categoryQueries = {
+        food_beverage: [
             "waiter",
             "waitress",
             "barista",
-            "hotel receptionist",
-            "front desk",
-            "guest service",
+            "kitchen helper",
+        ],
+
+        hospitality: [
             "housekeeping",
             "room attendant",
-            "kitchen helper",
+            "front desk",
         ],
 
         retail: [
             "cashier",
             "sales assistant",
-            "retail associate",
-            "store assistant",
-            "shop assistant",
+        ],
+
+        customer_service: [
             "customer service",
         ],
 
-        generalService: [
-            "office assistant",
-            "data entry",
-            "warehouse assistant",
-            "packing helper",
+        general_service: [
             "cleaner",
             "security guard",
-            "receptionist",
+            "warehouse assistant",
         ],
     };
 
 
-    const fetchJobBucket = async (titles, maximumPages = 5)=> {
+
+    const buildTitleQuery = (titles) => {
+    return titles
+        .map((title) => {
+            if (title.includes(" ")) {
+                return `"${title}"`;
+            }
+
+            return title;
+        })
+        .join(",");
+};
+
+
+    const fetchJobBucket = async (category, titles, maximumPages = 5)=> {
         const bucketJobs = [];
 
         for(let page = 1; page <= maximumPages; page++){
@@ -61,7 +72,7 @@ const fetchJobs = async () => {
                 format: "json",
                 countryCode: "ae",
                 dateCreated: "2026-08",
-                title: titles.join(","),
+                title: buildTitleQuery(titles),
                 isDuplicate: "false",
                 isActive: "true",
                 page: String(page),
@@ -89,7 +100,12 @@ const fetchJobs = async () => {
                 received: data.result.length,
             }); 
 
-            bucketJobs.push(...(data.result || []));
+            for(const rawJob of data.result){
+                bucketJobs.push({
+                    rawJob,
+                    category
+                });
+            }
         };
 
         return bucketJobs;
@@ -97,12 +113,10 @@ const fetchJobs = async () => {
 
 
 
-    const allJobs = await fetchJobBucket(
-        jobQueries.hospitality,
-        1
-    );
-
-    console.log(`Total fetched: ${allJobs.length}`);
+    // const allJobs = await fetchJobBucket(
+    //     jobQueries.hospitality,
+    //     1
+    // );
 
 
 
@@ -120,23 +134,59 @@ const fetchJobs = async () => {
         };
     };
 
-    
-
-    const jobs = allJobs
-    .map((job)=> normalizeJob(job))
-    .map((job)=> classifyJob(job));
 
 
 
+    const allFetchedJobs = [];
 
-    for(let index = 0; index < jobs.length; index++){
+    for(const [category, titles] of Object.entries(categoryQueries)){
+        const bucketJobs = await fetchJobBucket(category, titles, 1);
+
+        allFetchedJobs.push(...bucketJobs);
+    }
+
+    for(const fetchedJob of allFetchedJobs) {
+        const normalizedJob = normalizeJob(
+            fetchedJob.rawJob
+        );
+
+        const categorizedJob = {
+            ...normalizedJob,
+            categories: [fetchedJob.category]
+        };
+
+        const classifiedJob = classifyJob(categorizedJob);
+
         await saveJob(
-            jobs[index],
-            allJobs[index]
+            classifiedJob,
+            fetchedJob.rawJob
         );
     }
 
-    console.log(`Saved ${jobs.length} jobs successfully!`)
+
+
+    console.log(`Total fetched: ${allFetchedJobs.length}`);
+
+
+
+
+    
+
+    // const jobs = allJobs
+    // .map((job)=> normalizeJob(job))
+    // .map((job)=> classifyJob(job));
+
+
+
+
+    // for(let index = 0; index < jobs.length; index++){
+    //     await saveJob(
+    //         jobs[index],
+    //         allJobs[index]
+    //     );
+    // }
+
+   
 
 
 
