@@ -2,6 +2,7 @@ import "dotenv/config"
 import classifyJob from "./classifyJob.js"
 import saveJob from './saveJob.js'
 import database from "./database.js";
+import validateLocation from './validateLocation.js'
 
 const fetchJobs = async () => {
 
@@ -145,10 +146,22 @@ const fetchJobs = async () => {
         allFetchedJobs.push(...bucketJobs);
     }
 
+    let totalSaved = 0;
+    let rejectedLocations = 0;
+
     for(const fetchedJob of allFetchedJobs) {
         const normalizedJob = normalizeJob(
             fetchedJob.rawJob
         );
+
+        if(!validateLocation(normalizedJob)){
+            rejectedLocations++;
+
+            console.log(`Rejected location: ${normalizedJob.city} - ${normalizedJob.title}`                
+            );
+
+            continue;
+        }
 
         const categorizedJob = {
             ...normalizedJob,
@@ -161,11 +174,18 @@ const fetchJobs = async () => {
             classifiedJob,
             fetchedJob.rawJob
         );
+
+        totalSaved++;
     }
 
 
 
     console.log(`Total fetched: ${allFetchedJobs.length}`);
+
+    console.log({
+        saved: totalSaved,
+        rejectedLocations,
+    })
 
 
 

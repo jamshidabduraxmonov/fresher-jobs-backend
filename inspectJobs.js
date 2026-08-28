@@ -69,7 +69,10 @@ const inspectJobs = async ()=> {
                     DELETE FROM jobs
                     WHERE id = 'test-job-001'
                         OR source_url = 'https://example.com/jobs/test-job-001'
-                    RETURNING id, title;  
+                        OR city ILIKE '%Qatar%'
+                        OR city ILIKE '%Saudi Arabia%'
+                        OR city ILIKE '%Egypt%'
+                    RETURNING id, title, city;  
                     `);
                 
                     console.log("Deleted test rows: ");
