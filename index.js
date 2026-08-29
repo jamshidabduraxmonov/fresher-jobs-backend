@@ -65,6 +65,16 @@ const fetchJobs = async () => {
 };
 
 
+    const wait = (milliseconds) => {
+        return new Promise((resolve)=> {
+            setTimeout(resolve, milliseconds);
+        });
+    };
+
+
+
+
+
     const fetchJobBucket = async (category, titles, maximumPages = 5)=> {
         const bucketJobs = [];
 
@@ -82,6 +92,8 @@ const fetchJobs = async () => {
             const url =
                 "https://daily-international-job-postings.p.rapidapi.com/api/v2/jobs/search?" +
                 params.toString();
+
+            await wait(21_000);
 
             const response = await fetch(url, options);
 
