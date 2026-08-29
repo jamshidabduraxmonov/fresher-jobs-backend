@@ -61,6 +61,8 @@ const saveJob = async (job, rawData)=> {
         ]
     );
 
+    console.log("Saved: ", job.title, job.id);
+
     return result.rows[0];
 };
 

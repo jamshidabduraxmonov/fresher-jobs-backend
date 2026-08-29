@@ -78,11 +78,13 @@ const fetchJobs = async () => {
     const fetchJobBucket = async (category, titles, maximumPages = 5)=> {
         const bucketJobs = [];
 
+        console.log("Today's date: ", new Date().toISOString().split('T')[0])
+
         for(let page = 1; page <= maximumPages; page++){
             const params = new URLSearchParams({
                 format: "json",
                 countryCode: "ae",
-                dateCreated: "2026-08-29",
+                dateCreated: "2026-08-17",
                 title: buildTitleQuery(titles),
                 isDuplicate: "false",
                 isActive: "true",
@@ -165,52 +167,100 @@ const fetchJobs = async () => {
 
     const allFetchedJobs = [];
 
+    let totalFetched = 0;
+    let totalSaved = 0;
+    let rejectedLocations = 0;
+
     for(const [category, titles] of Object.entries(categoryQueries)){
         const bucketJobs = await fetchJobBucket(category, titles, 1);
 
         allFetchedJobs.push(...bucketJobs);
-    }
 
-    let totalSaved = 0;
-    let rejectedLocations = 0;
+        totalFetched += bucketJobs.length;
 
-    for(const fetchedJob of allFetchedJobs) {
-        const normalizedJob = normalizeJob(
-            fetchedJob.rawJob
-        );
+        for(const fetchedJob of bucketJobs) {
+            const normalizedJob = normalizeJob(
+                fetchedJob.rawJob
+            );
 
-        const locationCheck = validateLocation(normalizedJob);
+            const locationCheck = validateLocation(normalizedJob);
 
-        if(locationCheck === "foreign"){
+
+            if(locationCheck === "foreign"){
 
             console.log(
                 `Unknown location kept: ${normalizedJob.city} -- ${normalizedJob.title}`
             );
 
-        }else if(locationCheck === "unknown"){
-            rejectedLocations++;
+            }else if(locationCheck === "unknown"){
+                rejectedLocations++;
 
-            console.log(
-                `Rejected foreign location: ${normalizedJob.city} -- ${normalizedJob.title}`
+                console.log(
+                    `Rejected foreign location: ${normalizedJob.city} -- ${normalizedJob.title}`
+                );
+
+                continue;
+            }
+
+
+            const categorizedJob = {
+                ...normalizedJob,
+                categories: [fetchedJob.category]
+            };
+
+            const classifiedJob = classifyJob(categorizedJob);
+
+            await saveJob(
+                classifiedJob,
+                fetchedJob.rawJob
             );
 
-            continue;
+            totalSaved++
+
+
         }
-
-        const categorizedJob = {
-            ...normalizedJob,
-            categories: [fetchedJob.category]
-        };
-
-        const classifiedJob = classifyJob(categorizedJob);
-
-        await saveJob(
-            classifiedJob,
-            fetchedJob.rawJob
-        );
-
-        totalSaved++;
+        
     }
+
+    
+
+    // for(const fetchedJob of allFetchedJobs) {
+    //     const normalizedJob = normalizeJob(
+    //         fetchedJob.rawJob
+    //     );
+
+    //     const locationCheck = validateLocation(normalizedJob);
+
+    //     if(locationCheck === "foreign"){
+
+    //         console.log(
+    //             `Unknown location kept: ${normalizedJob.city} -- ${normalizedJob.title}`
+    //         );
+
+    //     }else if(locationCheck === "unknown"){
+    //         rejectedLocations++;
+
+    //         console.log(
+    //             `Rejected foreign location: ${normalizedJob.city} -- ${normalizedJob.title}`
+    //         );
+
+    //         continue;
+    //     }
+
+    //     const categorizedJob = {
+    //         ...normalizedJob,
+    //         categories: [fetchedJob.category]
+    //     };
+
+    //     const classifiedJob = classifyJob(categorizedJob);
+
+    //     await saveJob(
+    //         classifiedJob,
+    //         fetchedJob.rawJob
+    //     );
+
+    //     totalSaved++;
+    // }
 
 
 
