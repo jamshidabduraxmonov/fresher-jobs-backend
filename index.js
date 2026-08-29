@@ -167,10 +167,19 @@ const fetchJobs = async () => {
             fetchedJob.rawJob
         );
 
-        if(!validateLocation(normalizedJob)){
+        const locationCheck = validateLocation(normalizedJob);
+
+        if(locationCheck === "foreign"){
+
+            console.log(
+                `Unknown location kept: ${normalizedJob.city} -- ${normalizedJob.title}`
+            );
+
+        }else if(locationCheck === "unknown"){
             rejectedLocations++;
 
-            console.log(`Rejected location: ${normalizedJob.city} - ${normalizedJob.title}`                
+            console.log(
+                `Rejected foreign location: ${normalizedJob.city} -- ${normalizedJob.title}`
             );
 
             continue;
