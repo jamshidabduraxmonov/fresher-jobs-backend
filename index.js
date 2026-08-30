@@ -76,7 +76,7 @@ const fetchJobs = async () => {
 
 
     const fetchJobBucket = async (category, titles, maximumPages = 5)=> {
-        const bucketJobs = [];
+        let fetchedCount = 0;
 
         const currentDate = new Date().toLocaleDateString(
             "en-CA",
@@ -168,12 +168,20 @@ const fetchJobs = async () => {
                 received: data.result.length,
             }); 
 
-            for(const rawJob of data.result){
-                bucketJobs.push({
+            
+
+            const pageJobs = data.result.map((rawJob)=> {
+                return {
                     rawJob,
                     category
-                });
-            }
+                };
+            });
+
+            await saveFetchedJobs(pageJobs);
+
+            fetchedCount += pageJobs.length;
+
+
 
             const jobsPerPage = 10;
             
@@ -191,7 +199,7 @@ const fetchJobs = async () => {
             }
         };
 
-        return bucketJobs;
+        return fetchedCount;
     }
 
 
