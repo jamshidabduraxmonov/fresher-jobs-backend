@@ -78,13 +78,20 @@ const fetchJobs = async () => {
     const fetchJobBucket = async (category, titles, maximumPages = 5)=> {
         const bucketJobs = [];
 
-        console.log("Today's date: ", new Date().toISOString().split('T')[0])
+        const currentDate = new Date().toLocaleDateString(
+            "en-CA",
+            {
+                timeZone: "Asia/Dubai",
+            }
+        );
+
+        console.log("Today's date: ", currentDate);
 
         for(let page = 1; page <= maximumPages; page++){
             const params = new URLSearchParams({
                 format: "json",
                 countryCode: "ae",
-                dateCreated: "2026-08-17",
+                dateCreated: currentDate,
                 title: buildTitleQuery(titles),
                 isDuplicate: "false",
                 isActive: "true",
