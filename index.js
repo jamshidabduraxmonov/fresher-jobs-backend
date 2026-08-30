@@ -99,6 +99,39 @@ const fetchJobs = async () => {
 
             const response = await fetch(url, options);
 
+            let retryCount = 0;
+            const maximumRetries = 3;
+
+
+            while (
+                response.status === 429 &&
+                retryCount < maximumRetries
+            ){
+                retryCount++;
+
+                const retryAfterHeader =
+                    response.headers.get("retry-after");
+
+                const retryAfterSeconds = Number(retryAfterHeader);
+
+                const retryDelay =
+                    retryAfterSeconds > 0
+                        ? retryAfterSeconds * 1000
+                        : 60_000;
+
+                console.log(
+                    `Rate limit reached. Waiting ${
+                        retryDelay / 1000
+                    } seconds before retry ${retryCount}/${maximumRetries}`
+                );
+
+                await response.text();
+
+                await wait(retryDelay);
+
+                response = await fetch(url, options);
+            }
+            
             if(!response.ok) {
 
             const errorBody = await response.text();
