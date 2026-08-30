@@ -91,7 +91,7 @@ const fetchJobs = async () => {
             const params = new URLSearchParams({
                 format: "json",
                 countryCode: "ae",
-                dateCreated: currentDate,
+                dateCreated: "2026-08-30",
                 title: buildTitleQuery(titles),
                 isDuplicate: "false",
                 isActive: "true",
@@ -219,21 +219,9 @@ const fetchJobs = async () => {
 
 
 
+    const saveFetchedJobs = async (fetchedJobs)=> {
 
-    const allFetchedJobs = [];
-
-    let totalFetched = 0;
-    let totalSaved = 0;
-    let rejectedLocations = 0;
-
-    for(const [category, titles] of Object.entries(categoryQueries)){
-        const bucketJobs = await fetchJobBucket(category, titles, 1);
-
-        allFetchedJobs.push(...bucketJobs);
-
-        totalFetched += bucketJobs.length;
-
-        for(const fetchedJob of bucketJobs) {
+        for(const fetchedJob of fetchedJobs) {
             const normalizedJob = normalizeJob(
                 fetchedJob.rawJob
             );
@@ -274,6 +262,24 @@ const fetchJobs = async () => {
 
 
         }
+    }
+
+
+
+    const allFetchedJobs = [];
+
+    let totalFetched = 0;
+    let totalSaved = 0;
+    let rejectedLocations = 0;
+
+    for(const [category, titles] of Object.entries(categoryQueries)){
+        const bucketJobs = await fetchJobBucket(category, titles, 1);
+
+        allFetchedJobs.push(...bucketJobs);
+
+        totalFetched += bucketJobs.length;
+
+        await saveFetchedJobs(bucketJobs);
         
     }
 
