@@ -174,6 +174,21 @@ const fetchJobs = async () => {
                     category
                 });
             }
+
+            const jobsPerPage = 10;
+            
+            const reachedFinalPage =
+                data.result.length < jobsPerPage ||
+                page * jobsPerPage >= data.totalCount;
+
+
+            if(reachedFinalPage){
+                console.log(
+                    `Reached final page for ${category}.`
+                );
+
+                break;
+            }
         };
 
         return bucketJobs;
