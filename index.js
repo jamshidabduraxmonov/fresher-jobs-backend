@@ -6,7 +6,12 @@ import validateLocation from './validateLocation.js'
 
 const fetchJobs = async () => {
 
-
+    const report = {
+        fetched: 0,
+        saved: 0,
+        rejectedLocations: 0,
+        failed: 0,
+    };
 
    const options = {
     method: 'GET',
@@ -76,7 +81,7 @@ const fetchJobs = async () => {
 
 
     const fetchJobBucket = async (category, titles, maximumPages = 5)=> {
-        let fetchedCount = 0;
+        
 
         const currentDate = new Date().toLocaleDateString(
             "en-CA",
@@ -158,6 +163,8 @@ const fetchJobs = async () => {
 
             const data = await response.json();
 
+            report.fetched += data.result.length;
+
             if(data.result.length === 0){
                 break;
             }
@@ -179,7 +186,7 @@ const fetchJobs = async () => {
 
             await saveFetchedJobs(pageJobs);
 
-            fetchedCount += pageJobs.length;
+            
 
 
 
@@ -199,7 +206,7 @@ const fetchJobs = async () => {
             }
         };
 
-        return fetchedCount;
+    
     }
 
 
@@ -230,55 +237,67 @@ const fetchJobs = async () => {
     const saveFetchedJobs = async (fetchedJobs)=> {
 
         for(const fetchedJob of fetchedJobs) {
-            const normalizedJob = normalizeJob(
-                fetchedJob.rawJob
-            );
 
-            const locationCheck = validateLocation(normalizedJob);
+            try{
 
-
-            if(locationCheck === "foreign"){
-
-            console.log(
-                `Unknown location kept: ${normalizedJob.city} -- ${normalizedJob.title}`
-            );
-
-            }else if(locationCheck === "unknown"){
-                rejectedLocations++;
-
-                console.log(
-                    `Rejected foreign location: ${normalizedJob.city} -- ${normalizedJob.title}`
+                const normalizedJob = normalizeJob(
+                    fetchedJob.rawJob
                 );
 
-                continue;
+                const locationCheck = validateLocation(normalizedJob);
+
+
+                if(locationCheck === "foreign"){
+                    report.rejectedLocations++;
+
+                    console.log(
+                        `Rejected foreign location: ${normalizedJob.city} -- ${normalizedJob.title}`
+                    );
+
+                    continue;
+
+                }else if(locationCheck === "unknown"){
+                   
+                    console.log(
+                        `Unknown location kept: ${normalizedJob.city} -- ${normalizedJob.title}`
+                    );
+
+                }
+
+
+                const categorizedJob = {
+                    ...normalizedJob,
+                    categories: [fetchedJob.category]
+                };
+
+                const classifiedJob = classifyJob(categorizedJob);
+
+                await saveJob(
+                    classifiedJob,
+                    fetchedJob.rawJob
+                );
+
+                report.saved++;
+
+
+
+            }catch(error){
+                report.failed++;
+
+                console.error(
+                    `Failed job: ${fetchedJob.rawJob?.title}`,
+                    error.message
+                );
             }
 
-
-            const categorizedJob = {
-                ...normalizedJob,
-                categories: [fetchedJob.category]
-            };
-
-            const classifiedJob = classifyJob(categorizedJob);
-
-            await saveJob(
-                classifiedJob,
-                fetchedJob.rawJob
-            );
-
-            totalSaved++
-
-
+            
         }
-    }
+    };
 
 
 
     const allFetchedJobs = [];
 
-    let totalFetched = 0;
-    let totalSaved = 0;
-    let rejectedLocations = 0;
 
     for(const [category, titles] of Object.entries(categoryQueries)){
         const bucketJobs = await fetchJobBucket(category, titles, 1);
@@ -293,80 +312,37 @@ const fetchJobs = async () => {
 
     
 
-    // for(const fetchedJob of allFetchedJobs) {
-    //     const normalizedJob = normalizeJob(
-    //         fetchedJob.rawJob
-    //     );
-
-    //     const locationCheck = validateLocation(normalizedJob);
-
-    //     if(locationCheck === "foreign"){
-
-    //         console.log(
-    //             `Unknown location kept: ${normalizedJob.city} -- ${normalizedJob.title}`
-    //         );
-
-    //     }else if(locationCheck === "unknown"){
-    //         rejectedLocations++;
-
-    //         console.log(
-    //             `Rejected foreign location: ${normalizedJob.city} -- ${normalizedJob.title}`
-    //         );
-
-    //         continue;
-    //     }
-
-    //     const categorizedJob = {
-    //         ...normalizedJob,
-    //         categories: [fetchedJob.category]
-    //     };
-
-    //     const classifiedJob = classifyJob(categorizedJob);
-
-    //     await saveJob(
-    //         classifiedJob,
-    //         fetchedJob.rawJob
-    //     );
-
-    //     totalSaved++;
-    // }
 
 
 
-    console.log(`Total fetched: ${allFetchedJobs.length}`);
+    console.log(`Total fetched: ${report.fetched}`);
 
-    console.log({
-        saved: totalSaved,
-        rejectedLocations,
-    })
-
-
-
-
-    
-
-    // const jobs = allJobs
-    // .map((job)=> normalizeJob(job))
-    // .map((job)=> classifyJob(job));
-
-
-
-
-    // for(let index = 0; index < jobs.length; index++){
-    //     await saveJob(
-    //         jobs[index],
-    //         allJobs[index]
-    //     );
-    // }
-
-   
-
-
-
+  
 
    }catch(error){
     console.error(error);
    }finally {
+        const accountedFor =
+            report.saved +
+            report.rejectedLocations +
+            report.failed;
+        
+        const unaccounted =
+            report.fetched - accountedFor;
+
+        console.log("\nImport report:");
+
+        console.table(report);
+
+        if(unaccounted === 0) {
+            console.log("Every fetched job was accounted for.");
+        }else {
+            console.warn(
+                `${unaccounted} fetched jobs were not accounted for.`
+            );
+        }
+
+
         await database.end();
    }
 };
