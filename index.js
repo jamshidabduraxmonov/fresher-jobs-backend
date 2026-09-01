@@ -96,7 +96,7 @@ const fetchJobs = async () => {
             const params = new URLSearchParams({
                 format: "json",
                 countryCode: "ae",
-                dateCreated: "2026-08-30",
+                dateCreated: currentDate,
                 title: buildTitleQuery(titles),
                 isDuplicate: "false",
                 isActive: "true",
@@ -296,15 +296,13 @@ const fetchJobs = async () => {
 
 
 
-    const allFetchedJobs = [];
 
 
     for(const [category, titles] of Object.entries(categoryQueries)){
-        const bucketJobs = await fetchJobBucket(category, titles, 1);
+        await fetchJobBucket(category, titles, 1);
 
-        allFetchedJobs.push(...bucketJobs);
-
-        totalFetched += bucketJobs.length;
+        console.log("bucketJobs: ", bucketJobs);
+        
 
         await saveFetchedJobs(bucketJobs);
         
