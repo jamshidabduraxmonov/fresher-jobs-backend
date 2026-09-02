@@ -299,12 +299,8 @@ const fetchJobs = async () => {
 
 
     for(const [category, titles] of Object.entries(categoryQueries)){
-        await fetchJobBucket(category, titles, 1);
-
-        console.log("bucketJobs: ", bucketJobs);
         
-
-        await saveFetchedJobs(bucketJobs);
+        await fetchJobBucket(category, titles, 1);
         
     }
 
