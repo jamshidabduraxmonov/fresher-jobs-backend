@@ -81,22 +81,49 @@ const fetchJobs = async () => {
 
 
     const fetchJobBucket = async (category, titles, maximumPages = 5)=> {
-        
 
-        const currentDate = new Date().toLocaleDateString(
-            "en-CA",
-            {
-                timeZone: "Asia/Dubai",
-            }
+
+
+        const formatDubaiDate = (date) => {
+            return date.toLocaleDateString(
+                "en-CA",
+                {
+                    timeZone: "Asia/Dubai",
+                }
+            );
+        };
+
+        const endDateObject = new Date();
+
+        const oneDayInMilliseconds =
+            24 * 60 * 60 * 1000;
+
+        const startDateObject = new Date(
+            endDateObject.getTime() -
+            2 * oneDayInMilliseconds
         );
 
-        console.log("Today's date: ", currentDate);
+        const startDate = formatDubaiDate(
+            startDateObject
+        );
+
+        const endDate = formatDubaiDate(
+            endDateObject
+        );
+
+        console.log({
+            startDate,
+            endDate,
+        });
+
+
 
         for(let page = 1; page <= maximumPages; page++){
             const params = new URLSearchParams({
                 format: "json",
                 countryCode: "ae",
-                dateCreated: currentDate,
+                dateCreatedMin: startDate,
+                dateCreatedMax: endDate,
                 title: buildTitleQuery(titles),
                 isDuplicate: "false",
                 isActive: "true",
