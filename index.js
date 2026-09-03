@@ -255,6 +255,7 @@ const fetchJobs = async () => {
             description: job.jsonLD?.description,
             sourceURL: job.jsonLD?.url,
             postedAt: job.jsonLD?.datePosted,
+            expiresAt: job.jsonLD?.validThrough ?? null,
 
         };
     };

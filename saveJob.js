@@ -11,6 +11,7 @@ const saveJob = async (job, rawData)=> {
                 description,
                 source_url,
                 posted_at,
+                expires_at,
                 categories,
                 fresher_friendly,
                 fresher_score,
@@ -19,7 +20,7 @@ const saveJob = async (job, rawData)=> {
             )
             VALUES (
                 $1, $2, $3, $4, $5, $6, $7,
-                $8, $9, $10, $11, $12, $13
+                $8, $9, $10, $11, $12, $13, $14
             )
             ON CONFLICT (id)
             DO UPDATE SET
@@ -30,6 +31,10 @@ const saveJob = async (job, rawData)=> {
                 description = EXCLUDED.description,
                 source_url = EXCLUDED.source_url,
                 posted_at = EXCLUDED.posted_at,
+                expires_at = COALESCE(
+                    EXCLUDED.expires_at,
+                    jobs.expires_at
+                ),
                 categories = ARRAY(
                     SELECT DISTINCT category
                     FROM UNNEST(
@@ -53,6 +58,7 @@ const saveJob = async (job, rawData)=> {
             job.description || null,
             job.sourceURL || null,
             job.postedAt || null,
+            job.expiresAt || null,
             job.categories || [],
             job.fresherFriendly || false,
             job.fresherScore || 0,
