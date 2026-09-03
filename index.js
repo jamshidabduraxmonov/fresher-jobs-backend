@@ -237,11 +237,20 @@ const fetchJobs = async () => {
     }
 
 
+    const normalizeExpirationDate = (value) => {
+        if(!value) {
+            return null;
+        }
 
-    // const allJobs = await fetchJobBucket(
-    //     jobQueries.hospitality,
-    //     1
-    // );
+        const dayFirstDate =
+            value.match(/^(\d{2})-(\d{2})-(\d{4})&/);
+
+        if(!dayFirstDate) return value;
+
+        const [, day, month, year] = dayFirstDate;
+
+        return `${year}-${month}-${day}`;
+    }
 
 
 
@@ -255,7 +264,9 @@ const fetchJobs = async () => {
             description: job.jsonLD?.description,
             sourceURL: job.jsonLD?.url,
             postedAt: job.jsonLD?.datePosted,
-            expiresAt: job.jsonLD?.validThrough ?? null,
+            expiresAt: normalizeExpirationDate(
+                job.jsonLD?.validThrough ?? null
+            ),
 
         };
     };
