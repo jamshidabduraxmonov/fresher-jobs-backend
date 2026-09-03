@@ -14,6 +14,7 @@ const createJobsTable = async ()=> {
                 description TEXT,
                 source_url TEXT,
                 posted_at TIMESTAMPTZ,
+                expires_at TIMESTAMPTZ,
 
                 categories TEXT[] NOT NULL DEFAULT '{}',
 
