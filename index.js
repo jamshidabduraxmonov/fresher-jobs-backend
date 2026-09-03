@@ -341,7 +341,9 @@ const fetchJobs = async () => {
   
 
    }catch(error){
-    console.error(error);
+    console.error("Import failed: ", error);
+
+    process.exitCode = 1;
    }finally {
         const accountedFor =
             report.saved +
@@ -350,9 +352,7 @@ const fetchJobs = async () => {
         
         const unaccounted =
             report.fetched - accountedFor;
-
         console.log("\nImport report:");
-
         console.table(report);
 
         if(unaccounted === 0) {
@@ -362,6 +362,19 @@ const fetchJobs = async () => {
                 `${unaccounted} fetched jobs were not accounted for.`
             );
         }
+
+
+        const importHasFailures =
+            report.failed > 0 ||
+            unaccounted !== 0;
+        
+            if(importHasFailures){
+                console.error(
+                    "Import completed with failures."
+                );
+
+                process.exitCode = 1;
+            }
 
 
         await database.end();
