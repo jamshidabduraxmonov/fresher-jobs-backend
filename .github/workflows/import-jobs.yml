@@ -29,3 +29,6 @@ jobs:
 
       - name: Run job importer
         run: npm run import:jobs
+
+      - name: Deactivate expired jobs
+        run: npm run cleanup:expired-jobs
