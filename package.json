@@ -7,13 +7,14 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "import:jobs": "node index.js",
-    "cleanup:expired-jobs":  "node deactivateExpiredJobs.js"
+    "cleanup:expired-jobs": "node deactivateExpiredJobs.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^17.4.2",
+    "express": "^5.2.1",
     "pg": "^8.23.0"
   }
 }
