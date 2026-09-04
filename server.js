@@ -36,9 +36,26 @@ app.get("/api/jobs", async (request, response)=> {
             LIMIT 20; 
         `);
 
+        const jobs = result.rows.map((job)=> {
+            return {
+                id: job.id,
+                title: job.title,
+                company: job.company,
+                city: job.city,
+                industry: job.industry,
+                description: job.description,
+                sourceURL: job.source_url,
+                postedAt: job.posted_at,
+                expiresAt: job.expires_at,
+                categories: job.categories,
+                fresherFriendly: job.fresher_friendly,
+            };
+        });
+        
+
         response.json({
-            count: result.rows.length,
-            jobs: result.rows,
+            count: jobs.length,
+            jobs
         });
 
 
