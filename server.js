@@ -45,18 +45,27 @@ app.get("/api/jobs", async (request, response)=> {
 
         const offset = (page - 1) * limit;
 
+        const category = request.query.category || null;
+
         console.log({
             page,
             limit,
-            offset
+            offset,
+            category,
         });
 
 
         const countResult = await database.query(`
                 SELECT COUNT(*)::int AS total_jobs
                 FROM jobs
-                WHERE is_active = TRUE; 
-            `);
+                WHERE is_active = TRUE
+                    AND (
+                        $1::text IS NULL
+                        OR $1::TEXT = ANY(categories)
+                    );
+            `,
+            [category]
+        );
         
         const totalJobs = countResult.rows[0].total_jobs;
         const totalPages = Math.ceil(totalJobs / limit);
@@ -79,11 +88,15 @@ app.get("/api/jobs", async (request, response)=> {
                 fresher_score
             FROM jobs
             WHERE is_active = TRUE
+                AND (
+                    $1::text IS NULL
+                    OR $1::text = ANY(categories)
+                )
             ORDER BY posted_at DESC NULLS LAST
-            LIMIT $1
-            OFFSET $2; 
+            LIMIT $2
+            OFFSET $3; 
         `,
-        [limit, offset]
+        [category, limit, offset]
     );
 
         const jobs = result.rows.map((job)=> {
