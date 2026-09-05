@@ -15,7 +15,45 @@ app.get("/api/health", (request, response)=> {
 
 
 app.get("/api/jobs", async (request, response)=> {
+
+    console.log(request.query);
+
     try {
+
+        let page = Number.parseInt(
+            request.query.page,
+            10
+        );
+
+        let limit = Number.parseInt(
+            request.query.limit,
+            10
+        );
+
+        if(Number.isNaN(page) || page < 1){
+            page = 1;
+        };
+
+        if(Number.isNaN(limit)  || limit < 1){
+            limit = 20;
+        };
+
+
+        if(limit > 50){
+            limit = 50;
+        }
+
+        const offset = (page - 1) * limit;
+
+        console.log({
+            page,
+            limit,
+            offset
+        });
+
+
+
+
         const result = await database.query(`
             SELECT
                 id,
@@ -33,8 +71,11 @@ app.get("/api/jobs", async (request, response)=> {
             FROM jobs
             WHERE is_active = TRUE
             ORDER BY posted_at DESC NULLS LAST
-            LIMIT 20; 
-        `);
+            LIMIT $1
+            OFFSET $2; 
+        `,
+        [limit, offset]
+    );
 
         const jobs = result.rows.map((job)=> {
             return {
@@ -55,7 +96,7 @@ app.get("/api/jobs", async (request, response)=> {
 
         response.json({
             count: jobs.length,
-            jobs
+            jobs,
         });
 
 
