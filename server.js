@@ -52,6 +52,15 @@ app.get("/api/jobs", async (request, response)=> {
         });
 
 
+        const countResult = await database.query(`
+                SELECT COUNT(*)::int AS total_jobs
+                FROM jobs
+                WHERE is_active = TRUE; 
+            `);
+        
+        const totalJobs = countResult.rows[0].total_jobs;
+        const totalPages = Math.ceil(totalJobs / limit);
+
 
 
         const result = await database.query(`
@@ -95,7 +104,15 @@ app.get("/api/jobs", async (request, response)=> {
         
 
         response.json({
-            count: jobs.length,
+            pagination: {
+                page,
+                limit,
+                totalJobs,
+                totalPages,
+                returnedJobs: jobs.length,
+                hasNextPage: page < totalPages,
+                hasPreviousPages: page > 1,
+            },
             jobs,
         });
 
