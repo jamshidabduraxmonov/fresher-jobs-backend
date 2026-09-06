@@ -20,28 +20,60 @@ app.get("/api/jobs", async (request, response)=> {
 
     try {
 
-        let page = Number.parseInt(
-            request.query.page,
-            10
-        );
 
-        let limit = Number.parseInt(
-            request.query.limit,
-            10
-        );
+        const pageQuery = request.query.page;
 
-        if(Number.isNaN(page) || page < 1){
-            page = 1;
-        };
+        let page = 1;
 
-        if(Number.isNaN(limit)  || limit < 1){
-            limit = 20;
-        };
+        if(pageQuery !== undefined){
+            const parsedPage = Number(pageQuery);
 
+            if(
+                !Number.isInteger(parsedPage) ||
+                parsedPage < 1
+            ){
+                return response.status(400).json({
+                    error: "page must be a positive integer",
+                });
+            }
 
-        if(limit > 50){
-            limit = 50;
+            page = parsedPage;
         }
+
+
+
+
+
+        // let limit = Number.parseInt(
+        //     request.query.limit,
+        //     10
+        // );
+
+
+
+
+        const limitQuery = request.query.limit;
+
+        let limit = 20;
+
+        if(limitQuery !== undefined) {
+            const parsedLimit = Number(limitQuery);
+
+            if(
+                !Number.isInteger(parsedLimit) ||
+                parsedLimit < 1 ||
+                parsedLimit > 50
+            ){
+                return response.status(400).json({
+                    error:
+                    "limit must be an integer between 1 and 50",
+                });
+            }
+
+            limit = parsedLimit;
+        }
+
+
 
         const offset = (page - 1) * limit;
 
