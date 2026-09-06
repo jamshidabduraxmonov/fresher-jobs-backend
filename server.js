@@ -47,11 +47,22 @@ app.get("/api/jobs", async (request, response)=> {
 
         const category = request.query.category || null;
 
+        let fresherFriendly = null;
+
+        if(request.query.fresherFriendly === "true"){
+            fresherFriendly = true;
+        };
+
+        if(request.query.fresherFriendly === "false"){
+            fresherFriendly = false;
+        }
+
         console.log({
             page,
             limit,
             offset,
             category,
+            fresherFriendly,
         });
 
 
@@ -92,11 +103,15 @@ app.get("/api/jobs", async (request, response)=> {
                     $1::text IS NULL
                     OR $1::text = ANY(categories)
                 )
+                AND (
+                    $2::text IS NULL
+                    OR fresher_friendly = $2::boolean
+                )
             ORDER BY posted_at DESC NULLS LAST
-            LIMIT $2
-            OFFSET $3; 
+            LIMIT $3
+            OFFSET $4; 
         `,
-        [category, limit, offset]
+        [category, fresherFriendly, limit, offset]
     );
 
         const jobs = result.rows.map((job)=> {
