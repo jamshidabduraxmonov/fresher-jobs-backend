@@ -73,9 +73,13 @@ app.get("/api/jobs", async (request, response)=> {
                     AND (
                         $1::text IS NULL
                         OR $1::TEXT = ANY(categories)
+                    )
+                    AND (
+                        $2::boolean IS NULL
+                        OR fresher_friendly = $2::boolean
                     );
             `,
-            [category]
+            [category, fresherFriendly]
         );
         
         const totalJobs = countResult.rows[0].total_jobs;
