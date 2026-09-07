@@ -7,7 +7,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "import:jobs": "node index.js",
-    "cleanup:expired-jobs": "node deactivateExpiredJobs.js"
+    "cleanup:expired-jobs": "node deactivateExpiredJobs.js",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
