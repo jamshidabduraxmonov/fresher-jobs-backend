@@ -1,8 +1,15 @@
 import "dotenv/config";
 import express from "express";
-import database from "./database.js"
+import cors from "cors";
+import database from "./database.js";
 
 const app = express();
+
+app.use(
+    cors({
+        origin: "http://localhost:5173",
+    })
+);
 
 const PORT = process.env.PORT || 3000;
 
