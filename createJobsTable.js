@@ -31,6 +31,19 @@ const createJobsTable = async ()=> {
         `);
 
         console.log("Jobs table created successfully!");
+
+
+
+        await database.query(`
+            CREATE INDEX IF NOT EXISTS idx_jobs_active_newest
+            ON jobs (
+                posted_at DESC NULLS LAST,
+                id DESC
+            )
+            WHERE is_active = TRUE;
+            `);
+
+            console.log("Active jobs index created successfully!");
     }catch(error){
         console.error("Failed to create jobs table: ");
         console.error(error.message);
@@ -38,5 +51,8 @@ const createJobsTable = async ()=> {
         await database.end();
     }
 };
+
+
+
 
 createJobsTable();
