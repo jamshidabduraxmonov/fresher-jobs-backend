@@ -44,6 +44,34 @@ const createJobsTable = async ()=> {
             `);
 
             console.log("Active jobs index created successfully!");
+
+
+        
+        await database.query(`
+            CREATE INDEX IF NOT EXISTS idx_jobs_active_categories
+            ON jobs
+            USING GIN (categories)
+            WHERE is_active = TRUE;
+            `);
+
+        console.log("Active job categories index created successfully!");
+
+
+        await database.query(`
+            CREATE INDEX IF NOT EXISTS idx_jobs_active_fresher_newest
+            ON jobs (
+                posted_at DESC NULLS LAST,
+                id DESC
+            )
+            WHERE 
+                is_active = TRUE
+                AND fresher_friendly = TRUE;
+            `);
+
+        console.log("Active fresher jobs index created successfully!");
+
+
+
     }catch(error){
         console.error("Failed to create jobs table: ");
         console.error(error.message);

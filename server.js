@@ -154,7 +154,7 @@ app.get("/api/jobs", async (request, response, next)=> {
                 WHERE is_active = TRUE
                     AND (
                         $1::text IS NULL
-                        OR $1::TEXT = ANY(categories)
+                        OR categories @> ARRAY[$1::text]
                     )
                     AND (
                         $2::boolean IS NULL
@@ -187,7 +187,7 @@ app.get("/api/jobs", async (request, response, next)=> {
             WHERE is_active = TRUE
                 AND (
                     $1::text IS NULL
-                    OR $1::text = ANY(categories)
+                    OR categories @> ARRAY[$1::text]
                 )
                 AND (
                     $2::text IS NULL
