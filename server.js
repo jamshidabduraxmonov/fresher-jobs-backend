@@ -5,9 +5,13 @@ import database from "./database.js";
 
 const app = express();
 
+const frontendURL =
+    process.env.FRONTEND_URL ||
+    "http://localhost:5173";
+
 app.use(
     cors({
-        origin: "http://localhost:5173",
+        origin: frontendURL,
     })
 );
 
@@ -260,7 +264,7 @@ app.get("/api/jobs", async (request, response, next)=> {
 
 
 
-app.listen(PORT, ()=> {
+app.listen(PORT, "0.0.0.0", ()=> {
     console.log(
         `API server running at http://localhost:${PORT}`
     );
