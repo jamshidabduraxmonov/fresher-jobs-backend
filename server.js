@@ -108,16 +108,29 @@ app.get("/api/jobs", async (request, response)=> {
 
 
 
+        const fresherFriendlyQuery =
+                request.query.fresherFriendly;
 
         let fresherFriendly = null;
 
-        if(request.query.fresherFriendly === "true"){
-            fresherFriendly = true;
-        };
+        if(fresherFriendlyQuery !== undefined){
+            if(
+                fresherFriendlyQuery !== "true" &&
+                fresherFriendlyQuery !== "false"
+            ){
+                return response.status(400).json({
+                    error:
+                        "fresherFriendly must be true or false",
+                });
+            }
 
-        if(request.query.fresherFriendly === "false"){
-            fresherFriendly = false;
+            fresherFriendly =
+                fresherFriendlyQuery === "true";
         }
+        
+
+
+
 
         console.log({
             page,
