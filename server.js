@@ -241,6 +241,13 @@ app.get("/api/jobs", async (request, response)=> {
 
 
 
+    app.use((request, response) => {
+        response.status(404).json({
+            error: "Endpoint not found",
+        });
+    });
+
+
 
 
 app.listen(PORT, ()=> {
