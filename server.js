@@ -31,7 +31,7 @@ app.get("/api/health", (request, response)=> {
 
 
 
-app.get("/api/jobs", async (request, response)=> {
+app.get("/api/jobs", async (request, response, next)=> {
 
     console.log(request.query);
 
@@ -232,10 +232,7 @@ app.get("/api/jobs", async (request, response)=> {
 
 
     }catch(error){
-        console.error(
-            "Failed to fetch jobs: ",
-            error.message
-        );
+        next(error);
     }
 });
 
@@ -246,6 +243,19 @@ app.get("/api/jobs", async (request, response)=> {
             error: "Endpoint not found",
         });
     });
+
+    app.use(
+        (error, request, response, next) => {
+            console.error(
+                "Unhandled API error:",
+                error
+            );
+
+            response.status(500).json({
+                error: "Internal server error",
+            });
+        }
+    );
 
 
 
