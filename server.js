@@ -6,6 +6,16 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 
+
+const allowedCategories = [
+    "food_beverage",
+    "hospitality",
+    "retail",
+    "customer_service",
+    "general_service",
+];
+
+
 app.get("/api/health", (request, response)=> {
     response.json({
         status: "ok",
@@ -77,7 +87,27 @@ app.get("/api/jobs", async (request, response)=> {
 
         const offset = (page - 1) * limit;
 
-        const category = request.query.category || null;
+        
+        const categoryQuery = request.query.category;
+
+        let category = null;
+
+        if(categoryQuery !== undefined) {
+            if(
+                typeof categoryQuery !== "string" ||
+                !allowedCategories.includes(categoryQuery)
+            ){
+                return response.status(400).json({
+                    error: "Invalid category",
+                    allowedCategories,
+                });
+            }
+
+            category = categoryQuery;
+        }
+
+
+
 
         let fresherFriendly = null;
 
