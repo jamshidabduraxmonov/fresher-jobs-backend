@@ -242,6 +242,51 @@ app.get("/api/jobs", async (request, response, next)=> {
 
 
 
+    app.get("/api/jobs/:id", async (request, response, next)=> {
+        const jobId = request.params.id;
+
+        try {
+            const result = await database.query(
+                `
+                SELECT 
+                    id,
+                    title, 
+                    company,
+                    city,
+                    industry,
+                    description,
+                    source_url AS "sourceURL",
+                    posted_at AS "postedAt",
+                    expires_at AS "expiresAt",
+                    categories,
+                    fresher_friendly AS "fresherFriendly",
+                    fresher_score AS "fresherScore"
+                FROM jobs
+                WHERE id = $1
+                    AND is_active = TRUE;
+                `,
+                [jobId]
+            );
+
+            const job = result.rows[0];
+
+            if(!job) {
+                return response.status(404).json({
+                    error: "Job not found",
+                });
+            }
+
+            response.json({ job });
+
+
+        }catch(error){
+            next(error);
+        }
+        
+
+    })
+
+
     app.use((request, response) => {
         response.status(404).json({
             error: "Endpoint not found",
