@@ -217,6 +217,7 @@ app.get("/api/jobs", async (request, response, next)=> {
                 expiresAt: job.expires_at,
                 categories: job.categories,
                 fresherFriendly: job.fresher_friendly,
+                fresherScore: job.fresher_score,
             };
         });
         
@@ -229,7 +230,7 @@ app.get("/api/jobs", async (request, response, next)=> {
                 totalPages,
                 returnedJobs: jobs.length,
                 hasNextPage: page < totalPages,
-                hasPreviousPages: page > 1,
+                hasPreviousPage: page > 1,
             },
             jobs,
         });
