@@ -5,13 +5,16 @@ import database from "./database.js";
 
 const app = express();
 
-const frontendURL =
-    process.env.FRONTEND_URL ||
-    "http://localhost:5173";
+const allowedOrigins = [
+     process.env.FRONTEND_URL,
+    "http://localhost:5173",
+    "http://localhost:4173",
+].filter(Boolean);
+   
 
 app.use(
     cors({
-        origin: frontendURL,
+        origin: allowedOrigins,
     })
 );
 
