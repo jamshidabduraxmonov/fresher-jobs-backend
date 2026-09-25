@@ -243,7 +243,7 @@ const fetchJobs = async () => {
         }
 
         const dayFirstDate =
-            value.match(/^(\d{2})-(\d{2})-(\d{4})&/);
+            value.match(/^(\d{2})-(\d{2})-(\d{4})$/);
 
         if(!dayFirstDate) return value;
 
