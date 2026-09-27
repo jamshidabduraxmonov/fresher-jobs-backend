@@ -289,7 +289,76 @@ app.get("/api/jobs", async (request, response, next)=> {
         }
         
 
-    })
+    });
+
+
+    app.get('/sitemap.xml', async(request, response, next)=> {
+
+        const baseURL = process.env.FRONTEND_URL;
+
+        const staticRoutes = [
+            "/",
+            "/categories/freshers",
+            "/categories/food_beverage",
+            "/categories/hospitality",
+            "/categories/retail",
+            "/categories/customer_service",
+            "/categories/general_service",
+        ]
+
+        const staticURLs = staticRoutes
+            .map((route)=> {
+                return `
+                    <url>
+                        <loc>${baseURL}${route}</loc>
+                    </url>
+                `;
+            }).join("");
+
+
+        try {
+
+
+            const result = await database.query(
+                `
+                SELECT
+                id,
+                posted_at,
+                updated_at
+                FROM jobs
+                WHERE is_active = TRUE
+                `
+            );
+
+            const sitemapJobs = result.rows;
+            
+            const jobURLs = sitemapJobs
+                .map((job)=> {
+                    return`
+                        <url>
+                            <loc>${baseURL}/jobs/${job.id}</loc>
+                        </url>
+                    `;
+                }).join("");
+
+            const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+                <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+                    ${staticURLs}
+                    ${jobURLs}
+                </urlset>
+            `;
+
+            response.type("application/xml");
+            response.send(sitemap);
+
+
+        }catch(error){
+            next(error);
+        }
+    });
+
+
+
 
 
     app.use((request, response) => {
