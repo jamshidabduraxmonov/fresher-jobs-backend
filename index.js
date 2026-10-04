@@ -272,6 +272,29 @@ const fetchJobs = async () => {
     };
 
 
+    // DOMAIN BLOCKER
+
+    const BLOCKED_DOMAINS = [
+        "ae.jobsora.com",
+    ];
+
+    const isBlockedSource = (sourceURL) => {
+        if (!sourceURL) return false;
+
+        try {
+            const hostname = new URL(sourceURL).hostname.toLowerCase();
+
+            return BLOCKED_DOMAINS.some(
+                (domain) => 
+                    hostname === domain ||
+                    hostname.endsWith(`.${domain}`)
+            );
+        }catch {
+            return false;
+        }
+    }
+
+
 
     const saveFetchedJobs = async (fetchedJobs)=> {
 
@@ -282,6 +305,13 @@ const fetchJobs = async () => {
                 const normalizedJob = normalizeJob(
                     fetchedJob.rawJob
                 );
+
+                if(isBlockedSource(normalizedJob.sourceURL)) {
+                    console.log(
+                        `Skipping blocked source: ${normalizedJob.sourceURL}`
+                    );
+                    continue;
+                }
 
                 const locationCheck = validateLocation(normalizedJob);
 
