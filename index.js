@@ -11,6 +11,7 @@ const fetchJobs = async () => {
         saved: 0,
         rejectedLocations: 0,
         failed: 0,
+        blockedSources: 0,
     };
 
    const options = {
@@ -310,6 +311,9 @@ const fetchJobs = async () => {
                     console.log(
                         `Skipping blocked source: ${normalizedJob.sourceURL}`
                     );
+
+                    report.blockedSources++;
+
                     continue;
                 }
 
@@ -390,7 +394,8 @@ const fetchJobs = async () => {
         const accountedFor =
             report.saved +
             report.rejectedLocations +
-            report.failed;
+            report.failed +
+            report.blockedSources;
         
         const unaccounted =
             report.fetched - accountedFor;
