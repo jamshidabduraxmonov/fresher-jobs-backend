@@ -54,6 +54,31 @@ const fetchJobs = async () => {
             "security guard",
             "warehouse assistant",
         ],
+
+        software_development: [
+            "frontend developer",
+            "front end developer",
+            "react developer",
+            "web developer",
+
+            "backend developer",
+            "back end developer",
+            "node.js developer",
+            "node developer",
+
+            "software developer",
+            "software engineer",
+
+            "junior frontend developer",
+            "junior backend developer",
+            "junior software developer",
+            "junior software engineer",
+
+            "graduate software developer",
+            "graduate software engineer",
+            "software developer intern",
+            "software engineering intern",
+        ],
     };
 
 

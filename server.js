@@ -28,6 +28,7 @@ const allowedCategories = [
     "retail",
     "customer_service",
     "general_service",
+    "software_development",
 ];
 
 
